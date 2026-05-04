@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+        <style>
+            /* Ваши стили */
+            .admin-link {
+                text-align: right;
+                margin-bottom: 20px;
+            }
+            .admin-link a {
+                background-color: #2c3e50;
+                color: white;
+                padding: 8px 16px;
+                text-decoration: none;
+                border-radius: 4px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="admin-link">
+                <a href="/admin/">🔐 Панель администратора</a>
+            </div>
+
+            <h1>🛡️ {{ title }}</h1>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* CSS-стили для оформления интерфейса */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #ecf0f1;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .anomaly {
+            background-color: #ffe6e6;
+            color: #c0392b;
+        }
+        .normal {
+            background-color: #e6ffe6;
+            color: #27ae60;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        .alert {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .controls {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .controls input {
+            padding: 8px;
+            margin: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .controls button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #7f8c8d;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p>Мониторинг сетевого трафика вычислительных узлов грид-системы. Выявление аномалий и DDoS-атак.</p>
+
+        <!-- Панель управления параметрами -->
+        <div class="controls">
+            <h3>⚙️ Настройка порогов детектирования</h3>
+            <form method="get" action="">
+                <label>Порог пакетов/сек:</label>
+                <input type="number" name="threshold_packets" value="{{ stats.threshold_packets }}" min="100" max="2000">
+                <label>Порог пропускной способности (Мбит/с):</label>
+                <input type="number" name="threshold_bandwidth" value="{{ stats.threshold_bandwidth }}" min="10" max="200">
+                <button type="submit">Применить</button>
+            </form>
+        </div>
+
+        <!-- Статистика -->
+        <div class="stats">
+            <div class="stat-card">
+                <h3>📊 Всего записей</h3>
+                <div class="value">{{ stats.total_records }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>⚠️ Обнаружено аномалий</h3>
+                <div class="value" style="color: #e74c3c;">{{ stats.anomaly_count }}</div>
+            </div>
+
+
+<div class="stat-card">
+                <h3>📈 Процент аномалий</h3>
+                <div class="value">{{ stats.anomaly_percent }}%</div>
+            </div>
+            <div class="stat-card">
+                <h3>🕐 Время отчета</h3>
+                <div class="value" style="font-size: 16px;">{{ stats.timestamp }}</div>
+            </div>
+        </div>
+
+        <!-- Предупреждение при высоком уровне аномалий -->
+        {% if stats.anomaly_percent > 30 %}
+        <div class="alert">
+            ВНИМАНИЕ! Обнаружена нетипичная сетевая нагрузка! Возможна DDoS-атака.
+        </div>
+        {% endif %}
+
+        <!-- Таблица трафика -->
+        <h2>📋 Журнал сетевого трафика</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Время</th>
+                    <th>Пакеты/сек</th>
+                    <th>Мбит/с</th>
+                    <th>IP-адрес источника</th>
+                    <th>Протокол</th>
+                    <th>Статус</th>
+                    <th>Тип аномалии</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in traffic_data %}
+                <tr class="{% if item.is_anomaly %}anomaly{% else %}normal{% endif %}">
+                    <td>{{ item.timestamp }}</td>
+                    <td>{{ item.packets }}</td>
+                    <td>{{ item.bandwidth }}</td>
+                    <td>{{ item.source_ip }}</td>
+                    <td>{{ item.protocol }}</td>
+                    <td>{% if item.is_anomaly %}⚠️ Аномалия{% else %}✅ Норма{% endif %}</td>
+                    <td>{% if item.anomaly_type %}{{ item.anomaly_type }}{% else %}—{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Список аномалий -->
+        {% if anomalies %}
+        <h2>Детализация аномалий</h2>
+        <ul>
+            {% for anomaly in anomalies %}
+            <li>Время: {{ anomaly.timestamp }} | Источник: {{ anomaly.source_ip }} | Тип: {{ anomaly.anomaly_type }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <footer>
+            <p>Приложение для защиты грид-системы от нетипичной сетевой нагрузки (вариант 47)</p>
+            <p>Источник угрозы: внешний нарушитель со средним потенциалом | Объект: грид-система, сетевой трафик | Последствия: нарушение доступности</p>
+        <footer>
+            <p>Для входа в панель администратора: логин <strong>admin</strong>, пароль <strong>123456789</strong></p>
+        </footer>
+        </div>
+        </body>
+        </html>
