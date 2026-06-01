@@ -2,30 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{{ title }}</title>
-        <style>
-            /* Ваши стили */
-            .admin-link {
-                text-align: right;
-                margin-bottom: 20px;
-            }
-            .admin-link a {
-                background-color: #2c3e50;
-                color: white;
-                padding: 8px 16px;
-                text-decoration: none;
-                border-radius: 4px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="admin-link">
-                <a href="/admin/">🔐 Панель администратора</a>
-            </div>
-
-            <h1>🛡️ {{ title }}</h1>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
     <style>
         /* CSS-стили для оформления интерфейса */
         body {
@@ -117,6 +95,59 @@
             border-radius: 4px;
             cursor: pointer;
         }
+        .controls button:hover {
+            background: #2980b9;
+        }
+        .admin-link {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .admin-link a {
+            background-color: #2c3e50;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .admin-link a:hover {
+            background-color: #1a252f;
+        }
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .chart-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .chart-card h3 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .chart-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .save-info {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .save-info a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .save-info a:hover {
+            text-decoration: underline;
+        }
         footer {
             text-align: center;
             margin-top: 30px;
@@ -124,98 +155,150 @@
             color: #7f8c8d;
             border-top: 1px solid #ddd;
         }
+        .refresh-btn {
+            background: #27ae60;
+            margin-left: 10px;
+        }
+        .refresh-btn:hover {
+            background: #229954;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <p>Мониторинг сетевого трафика вычислительных узлов грид-системы. Выявление аномалий и DDoS-атак.</p>
+<div class="container">
+    <div class="admin-link">
+        <a href="/admin/">🔐 Панель администратора</a>
+    </div>
 
-        <!-- Панель управления параметрами -->
-        <div class="controls">
-            <h3>⚙️ Настройка порогов детектирования</h3>
-            <form method="get" action="">
-                <label>Порог пакетов/сек:</label>
-                <input type="number" name="threshold_packets" value="{{ stats.threshold_packets }}" min="100" max="2000">
-                <label>Порог пропускной способности (Мбит/с):</label>
-                <input type="number" name="threshold_bandwidth" value="{{ stats.threshold_bandwidth }}" min="10" max="200">
-                <button type="submit">Применить</button>
-            </form>
+    <h1>🛡️ {{ title }}</h1>
+
+    <p>Мониторинг сетевого трафика вычислительных узлов грид-системы. Выявление аномалий и DDoS-атак.</p>
+
+    <!-- Панель управления параметрами -->
+    <div class="controls">
+        <h3>⚙️ Настройка порогов детектирования</h3>
+        <form method="get" action="">
+            <label>Порог пакетов/сек:</label>
+            <input type="number" name="threshold_packets" value="{{ stats.threshold_packets }}" min="100" max="2000">
+            <label>Порог пропускной способности (Мбит/с):</label>
+            <input type="number" name="threshold_bandwidth" value="{{ stats.threshold_bandwidth }}" min="10" max="200">
+            <button type="submit">Применить</button>
+            <a href="?">
+                <button type="button" class="refresh-btn">🔄 Сбросить</button>
+            </a>
+        </form>
+    </div>
+
+    <!-- Статистика -->
+    <div class="stats">
+        <div class="stat-card">
+            <h3>📊 Всего записей</h3>
+            <div class="value">{{ stats.total_records }}</div>
         </div>
-
-        <!-- Статистика -->
-        <div class="stats">
-            <div class="stat-card">
-                <h3>📊 Всего записей</h3>
-                <div class="value">{{ stats.total_records }}</div>
-            </div>
-            <div class="stat-card">
-                <h3>⚠️ Обнаружено аномалий</h3>
-                <div class="value" style="color: #e74c3c;">{{ stats.anomaly_count }}</div>
-            </div>
-
-
-<div class="stat-card">
-                <h3>📈 Процент аномалий</h3>
-                <div class="value">{{ stats.anomaly_percent }}%</div>
-            </div>
-            <div class="stat-card">
-                <h3>🕐 Время отчета</h3>
-                <div class="value" style="font-size: 16px;">{{ stats.timestamp }}</div>
-            </div>
+        <div class="stat-card">
+            <h3>⚠️ Обнаружено аномалий</h3>
+            <div class="value" style="color: #e74c3c;">{{ stats.anomaly_count }}</div>
         </div>
+        <div class="stat-card">
+            <h3>📈 Процент аномалий</h3>
+            <div class="value">{{ stats.anomaly_percent }}%</div>
+        </div>
+        <div class="stat-card">
+            <h3>🕐 Время отчета</h3>
+            <div class="value" style="font-size: 16px;">{{ stats.timestamp }}</div>
+        </div>
+    </div>
 
-        <!-- Предупреждение при высоком уровне аномалий -->
-        {% if stats.anomaly_percent > 30 %}
-        <div class="alert">
-            ВНИМАНИЕ! Обнаружена нетипичная сетевая нагрузка! Возможна DDoS-атака.
+    <!-- Предупреждение при высоком уровне аномалий -->
+    {% if stats.anomaly_percent > 30 %}
+    <div class="alert">
+        ⚠️ ВНИМАНИЕ! Обнаружена нетипичная сетевая нагрузка! Возможна DDoS-атака.
+    </div>
+    {% endif %}
+
+    <!-- Графики и диаграммы -->
+    <h2>📈 Визуализация данных</h2>
+    <div class="charts-container">
+        {% if not matplotlib_available %}
+        <div class="alert" style="background-color: #f39c12;">
+            ⚠️ Библиотека matplotlib не установлена. Для отображения графиков выполните в терминале: <strong>pip install matplotlib</strong>
         </div>
         {% endif %}
+        <div class="chart-card">
+            <h3>📊 Пакеты в секунду</h3>
+            <img src="data:image/png;base64,{{ packet_plot }}" alt="График пакетов">
+            <div class="save-info">
+                💾 Сохранен как: <a href="{{ saved_packets_plot }}" target="_blank">{{ saved_packets_plot }}</a>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>📈 Пропускная способность (Мбит/с)</h3>
+            <img src="data:image/png;base64,{{ bandwidth_plot }}" alt="График пропускной способности">
+            <div class="save-info">
+                💾 Сохранен как: <a href="{{ saved_bandwidth_plot }}" target="_blank">{{ saved_bandwidth_plot }}</a>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>🥧 Распределение протоколов</h3>
+            <img src="data:image/png;base64,{{ protocol_chart }}" alt="Диаграмма протоколов">
+            <div class="save-info">
+                💾 Сохранен как: <a href="{{ saved_protocol_chart }}" target="_blank">{{ saved_protocol_chart }}</a>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>📊 Норма vs Аномалии</h3>
+            <img src="data:image/png;base64,{{ anomaly_chart }}" alt="Соотношение нормы и аномалий">
+            <div class="save-info">
+                💾 Сохранен как: <a href="{{ saved_anomaly_chart }}" target="_blank">{{ saved_anomaly_chart }}</a>
+            </div>
+        </div>
+    </div>
 
-        <!-- Таблица трафика -->
-        <h2>📋 Журнал сетевого трафика</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Время</th>
-                    <th>Пакеты/сек</th>
-                    <th>Мбит/с</th>
-                    <th>IP-адрес источника</th>
-                    <th>Протокол</th>
-                    <th>Статус</th>
-                    <th>Тип аномалии</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in traffic_data %}
-                <tr class="{% if item.is_anomaly %}anomaly{% else %}normal{% endif %}">
-                    <td>{{ item.timestamp }}</td>
-                    <td>{{ item.packets }}</td>
-                    <td>{{ item.bandwidth }}</td>
-                    <td>{{ item.source_ip }}</td>
-                    <td>{{ item.protocol }}</td>
-                    <td>{% if item.is_anomaly %}⚠️ Аномалия{% else %}✅ Норма{% endif %}</td>
-                    <td>{% if item.anomaly_type %}{{ item.anomaly_type }}{% else %}—{% endif %}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <!-- Список аномалий -->
-        {% if anomalies %}
-        <h2>Детализация аномалий</h2>
-        <ul>
-            {% for anomaly in anomalies %}
-            <li>Время: {{ anomaly.timestamp }} | Источник: {{ anomaly.source_ip }} | Тип: {{ anomaly.anomaly_type }}</li>
+    <!-- Таблица трафика -->
+    <h2>📋 Журнал сетевого трафика</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Время</th>
+                <th>Пакеты/сек</th>
+                <th>Мбит/с</th>
+                <th>IP-адрес источника</th>
+                <th>Протокол</th>
+                <th>Статус</th>
+                <th>Тип аномалии</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in traffic_data %}
+            <tr class="{% if item.is_anomaly %}anomaly{% else %}normal{% endif %}">
+                <td>{{ item.timestamp }}</td>
+                <td>{{ item.packets }}</td>
+                <td>{{ item.bandwidth }}</td>
+                <td>{{ item.source_ip }}</td>
+                <td>{{ item.protocol }}</td>
+                <td>{% if item.is_anomaly %}⚠️ Аномалия{% else %}✅ Норма{% endif %}</td>
+                <td>{% if item.anomaly_type %}{{ item.anomaly_type }}{% else %}---{% endif %}</td>
+            </tr>
             {% endfor %}
-        </ul>
-        {% endif %}
+        </tbody>
+    </table>
 
-        <footer>
-            <p>Приложение для защиты грид-системы от нетипичной сетевой нагрузки (вариант 47)</p>
-            <p>Источник угрозы: внешний нарушитель со средним потенциалом | Объект: грид-система, сетевой трафик | Последствия: нарушение доступности</p>
-        <footer>
-            <p>Для входа в панель администратора: логин <strong>admin</strong>, пароль <strong>123456789</strong></p>
-        </footer>
-        </div>
-        </body>
-        </html>
+    <!-- Список аномалий -->
+    {% if anomalies %}
+    <h2>🔍 Детализация аномалий</h2>
+    <ul>
+        {% for anomaly in anomalies %}
+        <li>Время: {{ anomaly.timestamp }} | Источник: {{ anomaly.source_ip }} | Тип: {{ anomaly.anomaly_type }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <footer>
+        <p>Приложение для защиты грид-системы от нетипичной сетевой нагрузки (вариант 39)</p>
+        <p>Источник угрозы: внешний нарушитель со средним потенциалом | Объект: грид-система, сетевой трафик | Последствия: нарушение доступности</p>
+        <p>Для входа в панель администратора: логин <strong>admin</strong>, пароль <strong>123456789</strong></p>
+        <p>📊 Все графики автоматически сохраняются в папку <strong>trafficmonitor/static/plots/</strong></p>
+    </footer>
+</div>
+</body>
+</html>
