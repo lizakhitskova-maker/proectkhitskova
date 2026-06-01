@@ -1,18 +1,19 @@
-from django.shortcuts import render
+# БЛОК ПОДКЛЮЧЕНИЯ БИБЛИОТЕК И МОДУЛЕЙ
+from django.shortcuts import render # Для рендеринга HTML-шаблонов
 from django.http import HttpResponse
-from django.views.decorators.cache import never_cache
-import random
-from datetime import datetime
+from django.views.decorators.cache import never_cache # Отключает кэширование страницы
+import random # Генерация случайных чисел для тестового трафика
+from datetime import datetime # Получение текущего времени
 import io
 import base64
 from collections import Counter
-import os
+import os # Работа с файловой системой (создание папок)
 
 # Попытка импорта matplotlib с обработкой ошибки
 try:
     import matplotlib
     matplotlib.use('Agg')  # Используем бэкенд без GUI
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt # Основная библиотека для построения графиков
     # Настройка русских шрифтов для matplotlib
     plt.rcParams['font.family'] = 'DejaVu Sans'
     plt.rcParams['axes.unicode_minus'] = False
@@ -21,7 +22,7 @@ except ImportError:
     MATPLOTLIB_AVAILABLE = False
     print("Предупреждение: matplotlib не установлен. Графики не будут отображаться.")
 
-
+    # БЛОК ГЕНЕРАЦИИ ГРАФИКА ПАКЕТОВ/СЕК
 def generate_packet_plot(traffic_data, threshold_packets):
     """Генерация графика пакетов/сек"""
     if not MATPLOTLIB_AVAILABLE:
@@ -55,7 +56,7 @@ def generate_packet_plot(traffic_data, threshold_packets):
 
     return image_base64
 
-
+    # БЛОК ГЕНЕРАЦИИ ГРАФИКА ПРОПУСКНОЙ СПОСОБНОСТИ
 def generate_bandwidth_plot(traffic_data, threshold_bandwidth):
     """Генерация графика пропускной способности"""
     if not MATPLOTLIB_AVAILABLE:
@@ -95,14 +96,14 @@ def generate_bandwidth_plot(traffic_data, threshold_bandwidth):
 
     return image_base64
 
-
+# БЛОК ГЕНЕРАЦИИ КРУГОВОЙ ДИАГРАММЫ ПРОТОКОЛОВ
 def generate_protocol_pie_chart(traffic_data):
     """Генерация круговой диаграммы распределения протоколов"""
     if not MATPLOTLIB_AVAILABLE:
         return None
 
     plt.figure(figsize=(8, 8))
-
+    # ПОДСЧЁТ КОЛИЧЕСТВА КАЖДОГО ПРОТОКОЛА
     protocols = [item['protocol'] for item in traffic_data]
     protocol_counts = Counter(protocols)
 
@@ -123,14 +124,14 @@ def generate_protocol_pie_chart(traffic_data):
 
     return image_base64
 
-
+    # БЛОК ГЕНЕРАЦИИ ДИАГРАММЫ СООТНОШЕНИЯ НОРМА/АНОМАЛИИ
 def generate_anomaly_pie_chart(traffic_data):
     """Генерация диаграммы соотношения нормального трафика и аномалий"""
     if not MATPLOTLIB_AVAILABLE:
         return None
 
     plt.figure(figsize=(8, 8))
-
+    # ПОДСЧЁТ НОРМАЛЬНЫХ И АНОМАЛЬНЫХ ЗАПИСЕЙ
     anomaly_count = sum(1 for item in traffic_data if item['is_anomaly'])
     normal_count = len(traffic_data) - anomaly_count
 
@@ -153,7 +154,7 @@ def generate_anomaly_pie_chart(traffic_data):
 
     return image_base64
 
-
+    # БЛОК СОХРАНЕНИЯ ГРАФИКОВ В PNG-ФАЙЛЫ
 def save_plots_to_png(traffic_data, threshold_packets, threshold_bandwidth):
     """Сохранение всех графиков в PNG файлы (перезапись старых)"""
     if not MATPLOTLIB_AVAILABLE:
@@ -232,16 +233,16 @@ def save_plots_to_png(traffic_data, threshold_packets, threshold_bandwidth):
            '/static/plots/bandwidth_plot.png', \
            '/static/plots/protocols_pie.png', \
            '/static/plots/anomaly_ratio_pie.png'
-    
+    # БЛОК ОСНОВНОЙ ФУНКЦИИ-КОНТРОЛЛЕРА (ОБРАБОТКА HTTP ЗАПРОСОВ)
 @never_cache
 def index(request):
-    # Параметры из URL (можно менять пороги)
+    # БЛОК ПОЛУЧЕНИЯ И ВАЛИДАЦИИ ВХОДНЫХ ПАРАМЕТРОВ
     threshold_packets = int(request.GET.get('threshold_packets', 800))
     threshold_bandwidth = int(request.GET.get('threshold_bandwidth', 90))
-
+    # БЛОК ИНИЦИАЛИЗАЦИИ МАССИВОВ ДАННЫХ
     traffic_data = []
     anomalies = []
-
+     # БЛОК ГЕНЕРАЦИИ ТЕСТОВЫХ ДАННЫХ (15 записей)
     for i in range(15):
         packets = random.randint(100, 1500)
         bandwidth = random.randint(20, 120)
